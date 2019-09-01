@@ -1,4 +1,4 @@
-# All networks are adversarial. 
+# All networks are adversarial...
 
 ...just depends on your perspective.
 
