@@ -2,7 +2,7 @@
 
 ## DigitalOcean DNS+VPN Tutorial 
 
-A quick tutorial with example configuration files & instructions to manually setup an recursive DNS server with the ability to blocks ad-networks and known badness along with a strongSwan VPN setup. This creates a self-contained privacy & security enhancing service that you can use as a safe network exit for your phones, networks, etc. For this tutorial, I am using a FreeBSD 12 host, all directions will be for that system. Porting over to your Linux distro of choice should be trivial...just directory structure changes.
+A quick tutorial with example configuration files & instructions to manually setup a recursive DNS server with the ability to blocks ad-networks and known badness along with a strongSwan VPN setup. This creates a self-contained privacy & security enhancing service that you can use as a safe network exit for your phones, networks, etc. For this tutorial, I am using a FreeBSD 12 host, all directions will be for that system. Porting over to your Linux distro of choice should be trivial...just directory structure changes.
 
 
 ### Recursive caching DNS w/ Ad-blocking using unbound
