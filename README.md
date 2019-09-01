@@ -31,7 +31,7 @@ The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts a
 #### Configure Unbound
 As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.99 alias is for use on the to-be created VPN network.
 
-1. Download the unbound.conf file
+1. Download the [unbound.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/unbound.conf) file
 2. Edit variables (e.g. allowed networks, etc.)
 3. `service unbound enable`
 4. `service unbound start`
@@ -138,7 +138,7 @@ Pro tip - this section and the follow export sections into notepad and search/re
 
 ### Configure strongSwan
 
-Download the ipsec.conf file from this repo and place it in ```/usr/local/etc/```. strongSwan uses terminology referring to the right and left of a connection. The right is the *server* side and the left side is the *client*
+Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/ipsec.conf) file from this repo and place it in ```/usr/local/etc/```. strongSwan uses terminology referring to the right and left of a connection. The right is the *server* side and the left side is the *client*
 
 1. Update the ```rightca``` line to match the variables you changed in the Certificate Authority creation. Specifically the C, O, and CN need to match perfectly.
 2. Update the ```leftid``` line to match the variables you set for C, O, and CN of the Server Certificate. Using the example above, CN should be the Server IP Address.
