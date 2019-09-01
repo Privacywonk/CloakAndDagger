@@ -153,7 +153,7 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 4. `service ipsec enable`
 5. `service ipsec start`
 6. Setup a test client (I suggest a linux client or android client using the strongSwan app). Follow the logs at `tail -f /var/log/charon.log` to see a connection working through. The logs will be pretty clear about connections not succeeding. They are *very* verbose...have fun googling errors. 
-7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell with `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. Make sure to update the ConnectionName to what you want it called. References: [Trail Of Bits] (https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
+7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell with `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. Make sure to update the ConnectionName to what you want it called. References: [Trail Of Bits](https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
 8. Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
 
 ## Todo 
@@ -168,6 +168,6 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 
 * **Rob Seastrom** - *DNS Ninja* - [Rob Seastrom](https://github.com/res3066) - guidance and a gut check on all things DNS.
 * **oogali** - *Network Ninja* - [oogali](https://github.com/oogali) - guidance and gut check on ipsec
-* [Pi-hole] (https://docs.pi-hole.net/guides/unbound/) as All-Around DNS Solution -- initial inspiration to replicate
-* [Calomel] Unbound Write up (https://calomel.org/unbound_dns.html) -- write up that got me thinking...
-* [strongSwan] (https://wiki.strongswan.org/projects/strongswan/wiki) -- great documentation
+* [Pi-hole](https://docs.pi-hole.net/guides/unbound/) as All-Around DNS Solution -- initial inspiration to replicate
+* [Calomel](https://calomel.org/unbound_dns.html) Unbound Write up -- write up that got me thinking...
+* [strongSwan](https://wiki.strongswan.org/projects/strongswan/wiki) -- great documentation
