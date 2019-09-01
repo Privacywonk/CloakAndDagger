@@ -13,7 +13,7 @@ The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts a
 2. Download latest root.hints file. `wget https://www.internic.net/domain/named.root -O /usr/local/etc/unbound/root.hints`
 	1. Add this to crontab (root) to update every six months: 
 	`0 0 1 */6 * wget https://www.internic.net/domain/named.root -O /usr/local/etc/unbound/root.hints && service unbound reload 2>&1`
-3. Setup `/usr/local/etc/unbound/root.key` for initial trust -- See [How to Enable DNSSEC] (https://nlnetlabs.nl/documentation/unbound/howto-anchor/) for authoritative documentation
+3. Setup `/usr/local/etc/unbound/root.key` for initial trust -- See [How to Enable DNSSEC](https://nlnetlabs.nl/documentation/unbound/howto-anchor/) for authoritative documentation
 	1. Essentially, you need to create `/usr/local/etc/unbound/root.key` with the latest data displayed on the page above...Here are the 2010-2011 and the 2017 trust anchors for the root zone. This is the syntax that you can use to provide an initial value for the root.key file. Unbound will update moving forward:
 	
 	```
