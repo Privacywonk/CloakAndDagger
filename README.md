@@ -6,7 +6,7 @@ A quick tutorial with example configuration files & instructions to manually set
 
 
 ### Recursive caching DNS w/ Ad-blocking using unbound
-The service uses DNSSEC and 0x20-encoded random bits to foil spoof attempt and creates a blackhole for known advertising networks, malware sites, and more. There will be a lot unexplained in this post. I highly encourage you to read up on each of the configuration options selected and understand how they work. Unbound's [documentation is fantastic](https://nlnetlabs.nl/documentation/unbound/). I have this in an IPv4 configuration only but you may want to embrace IPv6. Should make for simple config tweaks. 
+The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts and creates a blackhole for known advertising networks, malware sites, and more. There will be a lot unexplained in this post. I highly encourage you to read up on each of the configuration options selected and understand how they work. Unbound's [documentation is fantastic](https://nlnetlabs.nl/documentation/unbound/). I have this in an IPv4 configuration only but you may want to embrace IPv6. Should make for simple config tweaks. 
 
 #### Pre-work
 1. Install unbound and bind-tools on your cloud host.  `pkg install unbound bind-tools`
