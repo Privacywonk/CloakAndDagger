@@ -27,8 +27,9 @@ The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts a
 	1. Modify `/usr/local/bin/void-zones-update.sh` with my version that includes 6 additional blacklist sources
 	2. Add to crontab `30 07 * * * /usr/local/bin/void-zones-update.sh && service unbound reload > /dev/null 2>&1`
 5. Configure new interface alias for dedicated DNS service on VPN network (change network to your own specifications)
-	1. Edit /etc/rc.conf and add  `ifconfig_vtnet0_alias1="inet 10.99.99.99 netmask 255.255.255.0"`
+	1. Edit `/etc/rc.conf` and add  `ifconfig_vtnet0_alias1="inet 10.99.99.99 netmask 255.255.255.0"`
 	2. Take care with this new interface. Explore other services that may bind to 0.0.0.0 (e.g. SSH). Do not expose unnecessary services via this new network.
+6. Edit `/etc/rc.conf` and add `unbound_enable="YES"`
 
 #### Configure Unbound
 As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.99 alias is for use on the to-be created VPN network.
@@ -45,7 +46,7 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 
 #### Update resolv.conf
 1. Add 127.0.0.1 and 10.99.99.99 to /etc/resolv.conf
-
+2. Add `strongswan_enable="YES"` to `/etc/rc.conf`
 
 ### strongswan VPN 
 
@@ -53,6 +54,7 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 1. Verify kernel has NAT Tunneling (natt) and the crypto device (user-mode access to hardware-accelerated cryptography) enabled`/sbin/sysctl -a |egrep crypto|ipsec` look for `device crypto` and `kern.feature.ipsec` and `kern.feature.ipsec_natt = 1`
 	1. if these are set to 0 or the device is missing, see [strongSwan documentation](https://wiki.strongswan.org/projects/strongswan/wiki/FreeBSD) for instructions to fix 
 2. Install strongSwan `pkg install strongswan`
+3. 
 
 #### Create Certificate Infrastructure
 
@@ -158,9 +160,72 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell with `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. Make sure to update the ConnectionName to what you want it called. References: [Trail Of Bits](https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
 8. Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
 
-## Todo 
-1. Add firewall configuration 
-2. Add suricata configuration for IDS
+### Firewall 
+
+Quick IPFW firewall setup for SSH, DNS, IPSEC+NAT
+
+#### Pre-work
+
+1. Modify `/etc/rc.conf` to include:
+
+```
+firewall_enable="YES"
+firewall_script="/usr/local/etc/ipfw.rules"
+firewall_logging="YES"
+gateway_enable="YES"
+natd_enable="YES"
+natd_interface="vtnet0"
+natd_flags="-dynamic -m"
+```
+2. Create `/usr/local/etc/ipfw.rules` and add the content below. Modify variables to your environment.
+
+```
+IPF="ipfw -q add"
+WAN="vtnet0"
+WAN_IP="[YOUR IP HERE]"
+strongSwanNetwork="10.99.99.0/24"
+ipfw -q -f flush
+
+
+#loopback
+$IPF 10 allow all from any to any via lo0
+$IPF 20 deny all from any to 127.0.0.0/8
+$IPF 30 deny all from 127.0.0.0/8 to any
+$IPF 40 deny tcp from any to any frag
+
+#nat config
+ipfw -q nat 1 config if $WAN reset
+$IPF 50 nat 1 all from $strongSwanNetwork to any via $WAN out
+$IPF 55 nat 1 all from any to me via $WAN in
+
+# statefull
+$IPF 100 check-state
+$IPF 110 allow tcp from any to any established
+$IPF 120 allow all from any to any out keep-state
+$IPF 130 allow icmp from any to any
+
+#DNS
+$IPF 1000 allow udp from any to any 53 in
+$IPF 1010 allow tcp from any to any 53 in
+$IPF 1020 allow udp from any to any 53 out
+$IPF 1030 allow tcp from any to any 53 out
+
+#SSH
+$IPF 2000 allow tcp from any to $WAN_IP 22 in
+$IPF 2010 allow tcp from any to $WAN_IP 22 out
+
+#strongSwan
+$IPF 3000 allow esp from any to any
+$IPF 3010 allow ah from any to any
+$IPF 3020 allow ipencap from any to any
+$IPF 3030 allow udp from any to any 500
+$IPF 3030 allow udp from any to any 4500
+$IPF 3040 allow udp from any to any in recv $WAN frag
+
+# deny and log everything
+$IPF 65534 deny log all from any to any
+
+```
 
 ## Authors
 
@@ -169,7 +234,7 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 ## Contributors/Credits/References
 
 * **Rob Seastrom** - *DNS Ninja* - [Rob Seastrom](https://github.com/res3066) - guidance and a gut check on all things DNS.
-* **oogali** - *Network Ninja* - [oogali](https://github.com/oogali) - guidance and gut check on ipsec
+* **oogali** - *Network Ninja* - [oogali](https://github.com/oogali) - guidance and gut check on ipsec and firewall
 * [Pi-hole](https://docs.pi-hole.net/guides/unbound/) as All-Around DNS Solution -- initial inspiration to replicate
 * [Calomel](https://calomel.org/unbound_dns.html) Unbound Write up -- write up that got me thinking...
 * [strongSwan](https://wiki.strongswan.org/projects/strongswan/wiki) -- great documentation
