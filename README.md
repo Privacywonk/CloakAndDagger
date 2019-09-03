@@ -46,7 +46,6 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 
 #### Update resolv.conf
 1. Add 127.0.0.1 and 10.99.99.99 to /etc/resolv.conf
-2. Add `strongswan_enable="YES"` to `/etc/rc.conf`
 
 ### 2. strongswan VPN 
 
@@ -54,7 +53,7 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 1. Verify kernel has NAT Tunneling (natt) and the crypto device (user-mode access to hardware-accelerated cryptography) enabled`/sbin/sysctl -a |egrep crypto|ipsec` look for `device crypto` and `kern.feature.ipsec` and `kern.feature.ipsec_natt = 1`
 	1. if these are set to 0 or the device is missing, see [strongSwan documentation](https://wiki.strongswan.org/projects/strongswan/wiki/FreeBSD) for instructions to fix 
 2. Install strongSwan `pkg install strongswan`
-3. 
+3. Add `strongswan_enable="YES"` to `/etc/rc.conf`
 
 #### Create Certificate Infrastructure
 
