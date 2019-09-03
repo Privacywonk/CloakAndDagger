@@ -130,11 +130,11 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 ##### 8. Export Options for client certs, bundles, etc.
 ###### PCKS 12 Export
 
-`openssl pkcs12 -export -inkey private/client.key.pem -in certs/client.cert.pem -name "client" -certfile cacerts/ipsec-ca-cert.pem -out cacerts/client.cert.p12`
+`openssl pkcs12 -export -inkey private/client.key.pem -in certs/client.cert.pem -name "client" -certfile cacerts/ipsec-ca-cert.pem -out certs/client.cert.p12`
 
 ###### Package for Mobile (android). Install ipsec-ca-cert.pem separately
 
-`openssl pkcs12 -export -inkey private/client.key.pem -in certs/client.cert.pem -name "client" -caname "VPN_SERVER_IP"  -out cacerts/client.cert.p12`
+`openssl pkcs12 -export -inkey private/client.key.pem -in certs/client.cert.pem -name "client" -caname "VPN_SERVER_IP"  -out certs/client.cert.p12`
 
 ###### Windows Cert File needs
 
