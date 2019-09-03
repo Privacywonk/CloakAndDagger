@@ -81,9 +81,10 @@ Update the Country (C), Organization (O), and Common Name (CN) to your own envir
 
 Pro tip - this section and the follow export sections into notepad and search/replace "client" with your client name for copy/pasta cert generation.
 
-
-`ipsec pki --gen --outform pem > private/client.key.pem
-`ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=US, O=TEST, CN=client" --outform pem > certs/client.cert.pem`
+```
+ipsec pki --gen --outform pem > private/client.key.pem
+ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=US, O=TEST, CN=client" --outform pem > certs/client.cert.pem
+```
 
 ##### 6. Script for CA & Server Keys
 
