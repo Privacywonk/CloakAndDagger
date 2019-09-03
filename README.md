@@ -7,7 +7,7 @@
 A quick tutorial with example configuration files & instructions to manually setup a recursive DNS server with the ability to blocks ad-networks and known badness along with a strongSwan VPN setup. This creates a self-contained privacy & security enhancing service that you can use as a safe network exit for your phones, networks, etc. For this tutorial, I am using a FreeBSD 12 host, all directions will be for that system. Porting over to your Linux distro of choice should be trivial...just directory structure changes.
 
 
-### Recursive caching DNS w/ Ad-blocking using unbound
+### 1. Recursive caching DNS w/ Ad-blocking using unbound
 The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts and creates a blackhole for known advertising networks, malware sites, and more. There will be a lot unexplained in this post. I highly encourage you to read up on each of the configuration options selected and understand how they work. Unbound's [documentation is fantastic](https://nlnetlabs.nl/documentation/unbound/). I have this in an IPv4 configuration only but you may want to embrace IPv6. Should make for simple config tweaks. 
 
 #### Pre-work
@@ -48,7 +48,7 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 1. Add 127.0.0.1 and 10.99.99.99 to /etc/resolv.conf
 2. Add `strongswan_enable="YES"` to `/etc/rc.conf`
 
-### strongswan VPN 
+### 2. strongswan VPN 
 
 #### Pre-work
 1. Verify kernel has NAT Tunneling (natt) and the crypto device (user-mode access to hardware-accelerated cryptography) enabled`/sbin/sysctl -a |egrep crypto|ipsec` look for `device crypto` and `kern.feature.ipsec` and `kern.feature.ipsec_natt = 1`
@@ -160,7 +160,7 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell with `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. Make sure to update the ConnectionName to what you want it called. References: [Trail Of Bits](https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
 8. Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
 
-### Firewall 
+### 3. Firewall 
 
 Quick IPFW firewall setup for SSH, DNS, IPSEC+NAT
 
