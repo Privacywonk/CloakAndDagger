@@ -237,3 +237,5 @@ $IPF 65534 deny log all from any to any
 * [Pi-hole](https://docs.pi-hole.net/guides/unbound/) as All-Around DNS Solution -- initial inspiration to replicate
 * [Calomel](https://calomel.org/unbound_dns.html) Unbound Write up -- write up that got me thinking...
 * [strongSwan](https://wiki.strongswan.org/projects/strongswan/wiki) -- great documentation
+* [IPFW Firewall Examples](http://www.freebsdonline.com/content/view/725/531/)
+* [FreeBSD Handbook (PDF)](http://ftp.freebsd.org/pub/FreeBSD/doc/handbook/book.pdf)
