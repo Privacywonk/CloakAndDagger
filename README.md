@@ -78,6 +78,8 @@ Update the Country (C), Organization (O), and Common Name (CN) to your own envir
 
 ##### 5. Client Keys & Certs 
 
+Replace "client" with your desired name for the client certificate. This could me "mobile" or "laptop". Pay closee attention to the differences between the linux and windows cert handling.  Windows needs an extra clientAuth flag and *must* have a `--san dns:client` tag that is the same as the CN.
+
 For linux/android/iOS certificates:
 
 ```
