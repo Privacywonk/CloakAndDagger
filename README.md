@@ -183,7 +183,7 @@ natd_flags="-dynamic -m"
 
 ```
 IPF="ipfw -q add"
-WAN="vtnet0"
+WAN="[WANY interface here, e.g. eth0]"
 WAN_IP="[YOUR IP HERE]"
 strongSwanNetwork="10.99.99.0/24"
 ipfw -q -f flush
