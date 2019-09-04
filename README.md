@@ -24,7 +24,7 @@ The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts a
     ```
     
 4. Install void-zones-tools package for ad blocking `pkg install void-zones-tools`
-	1. Modify `/usr/local/bin/void-zones-update.sh` with my version that includes 6 additional blacklist sources
+	1. Modify `/usr/local/bin/void-zones-update.sh` with [my version](https://github.com/Privacywonk/void-zones-tools/blob/master/void-zones-update.sh) that includes 6 additional blacklist sources
 	2. Add to crontab `30 07 * * * /usr/local/bin/void-zones-update.sh && service unbound reload > /dev/null 2>&1`
 5. Configure new interface alias for dedicated DNS service on VPN network (change network to your own specifications)
 	1. Edit `/etc/rc.conf` and add  `ifconfig_vtnet0_alias1="inet 10.99.99.99 netmask 255.255.255.0"`
