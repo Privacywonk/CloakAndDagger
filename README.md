@@ -111,9 +111,9 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 
 ```
    #!/bin/bash
-   vpn_ip="1.2.3.4"
    country="US"
    organization="TEST"
+   cd /usr/local/etc/ipsec.d
 
    if [ "$1" == "" ]; then
 
