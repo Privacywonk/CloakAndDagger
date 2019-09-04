@@ -157,8 +157,10 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 4. `service ipsec enable`
 5. `service ipsec start`
 6. Setup a test client (I suggest a linux client or android client using the strongSwan app). Follow the logs at `tail -f /var/log/charon.log` to see a connection working through. The logs will be pretty clear about connections not succeeding. They are *very* verbose...have fun googling errors. 
-7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell with `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. Make sure to update the ConnectionName to what you want it called. References: [Trail Of Bits](https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
-8. Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
+7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell
+	1. Create the new VPN Connection `Settings > Network & Internet > VPN > Add a VPN connection.` Note the name you chose for the connection.
+	2. Open PowerShell as an admin and run (make sure to update the ConnectionName) `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. References: [Trail Of Bits](https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
+8. A tip for iOS clients: Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
 
 ### 3. Firewall 
 
