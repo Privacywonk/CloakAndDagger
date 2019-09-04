@@ -36,10 +36,9 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 
 1. Download the [unbound.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/unbound.conf) file
 2. Edit variables (e.g. allowed networks, etc.)
-3. `service unbound enable`
-4. `service unbound start`
-5. `tail -f /usr/local/etc/unbound/unbound.log` to verify successful startup or correct configuration issues
-6. Test DNS & DNSSEC:
+3. `service unbound start`
+4. `tail -f /usr/local/etc/unbound/unbound.log` to verify successful startup or correct configuration issues
+5. Test DNS & DNSSEC:
 	1. `dig @127.0.0.1 dnssec-failed.org. soa` should return `SERVFAIL` and no IP address
 	2. `dig @127.0.0.1 internetsociety.org. soa` should return `NOERROR` and an IP address
 
@@ -175,13 +174,12 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 : RSA /usr/local/etc/ipsec.d/private/phone.key.pem
 ```
  
-4. `service ipsec enable`
-5. `service ipsec start`
-6. Setup a test client (I suggest a linux client or android client using the strongSwan app). Follow the logs at `tail -f /var/log/charon.log` to see a connection working through. The logs will be pretty clear about connections not succeeding. They are *very* verbose...have fun googling errors. 
-7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell
+4. `service ipsec start`
+5. Setup a test client (I suggest a linux client or android client using the strongSwan app). Follow the logs at `tail -f /var/log/charon.log` to see a connection working through. The logs will be pretty clear about connections not succeeding. They are *very* verbose...have fun googling errors. 
+6. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell
 	1. Create the new VPN Connection `Settings > Network & Internet > VPN > Add a VPN connection.` Note the name you chose for the connection.
 	2. Open PowerShell as an admin and run (make sure to update the ConnectionName) `Set-VpnConnectionIPsecConfiguration -ConnectionName "..." -AuthenticationTransformConstants SHA256128 -CipherTransformConstants AES256 -EncryptionMethod AES256 -IntegrityCheckMethod SHA256 -DHGroup Group14 -PfsGroup PFS2048`. References: [Trail Of Bits](https://github.com/trailofbits/algo/issues/9) and [strongSwan Windows Documentation](https://wiki.strongswan.org/projects/strongswan/wiki/WindowsClients)
-8. A tip for iOS clients: Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
+7. A tip for iOS clients: Check out [Apple Configurator Two](https://apps.apple.com/us/app/apple-configurator-2/id1037126344?mt=12) to help build configurations and ship them to your iOS devices.
 
 ### 3. Firewall 
 
