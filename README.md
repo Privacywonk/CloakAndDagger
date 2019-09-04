@@ -200,6 +200,8 @@ natd_enable="YES"
 natd_interface="vtnet0"
 natd_flags="-dynamic -m"
 ```
+*Note* - comment out or delete `#firewall_type="open"` as it will conflict with the `firewall_script` directive.
+
 2. Create `/usr/local/etc/ipfw.rules` and add the content below. Modify variables to your environment.
 
 ```
