@@ -110,19 +110,23 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 ##### 7. Script for client certs and keys
 
 ```
-   #!/bin/bash
-   country="US"
-   organization="TEST"
-   cd /usr/local/etc/ipsec.d
+    #!/bin/bash
+    country="US"
+    organization="TEST"
+    cd /usr/local/etc/ipsec.d
 
-   if [ "$1" == "" ]; then
+    if [ "$1" == "" ]; then
 
-       echo -n "Enter a client name:"
-	   read client
-   fi
+       echo -n "Enter a client name: "
+           read client
+    fi
 
-   ipsec pki --gen --outform pem > private/client.key.pem
-   ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=${country}, O="${organization}", CN=${client}" --outform pem > certs/client.cert.pem
+    echo "Creating "${client}" private key..."
+    ipsec pki --gen --outform pem > private/"${client}".key.pem
+    echo "Creating "${client}" certificate..."
+    ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn C="${country}", O="${organization}", CN="${client}" --outform pem > certs/"${client}".cert.pem
+    echo "Packaging up for export..."
+    openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem -name \""${client}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}".cert.p12
 
 ```
 
