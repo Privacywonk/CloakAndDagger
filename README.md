@@ -75,15 +75,23 @@ Update the Country (C), Organization (O), and Common Name (CN) to your own envir
 
 ##### 4. Server Cert
 
-`pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=US, O=TEST, CN=VPN_SERVER_IP" --san "VPN_SERVER_IP" > certs/ipsec-server-cert.pem`
+`ipsec pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=US, O=TEST, CN=VPN_SERVER_IP" --san "VPN_SERVER_IP" > certs/ipsec-server-cert.pem`
 
 ##### 5. Client Keys & Certs 
 
-Pro tip - this section and the follow export sections into notepad and search/replace "client" with your client name for copy/pasta cert generation.
+For linux/android/iOS certificates:
 
 ```
 ipsec pki --gen --outform pem > private/client.key.pem
 ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=US, O=TEST, CN=client" --outform pem > certs/client.cert.pem
+```
+
+For Windows Certificates:
+
+
+```
+ipsec pki --gen --outform pem > private/client.key.pem
+ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=US, O=TEST, CN=client" --flag clientAuth --san dns:client --outform pem > certs/client.cert.pem
 ```
 
 ##### 6. Script for CA & Server Keys
@@ -104,7 +112,7 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 
    ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem   
 
-   pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=${country}, O=${organization}, CN=${vpn_ip}" --san "${vpn_ip}" > certs/ipsec-server-cert.pem
+   ipsec pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=${country}, O=${organization}, CN=${vpn_ip}" --san "${vpn_ip}" --san dns:"${vpn_ip}" > certs/ipsec-server-cert.pem
 ```
 
 ##### 7. Script for client certs and keys
@@ -123,10 +131,19 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 
     echo "Creating "${client}" private key..."
     ipsec pki --gen --outform pem > private/"${client}".key.pem
+    
     echo "Creating "${client}" certificate..."
     ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn C="${country}", O="${organization}", CN="${client}" --outform pem > certs/"${client}".cert.pem
-    echo "Packaging up for export..."
-    openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem -name \""${client}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}".cert.p12
+    ipsec pki --print -i certs/"${client}".cert.pem
+       
+    echo "Creating "${client}" Windows certificate..."
+    ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=${country}, O=${organization}, CN=${client}" --flag clientAuth --san dns:"${client}" --outform pem > certs/"${client}"-windows.cert.pem
+
+    ipsec pki --print -i certs/"${client}"-windows.cert.pem
+
+   echo "Packing for Windows Export (creating .p12 bundle)...certs/"${client}"-windows.cert.p12"
+   openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem -name \""${clie
+nt}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}"-windows.cert.p12 -passout pass:
 
 ```
 
