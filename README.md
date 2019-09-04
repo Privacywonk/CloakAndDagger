@@ -250,6 +250,9 @@ $IPF 65534 deny log all from any to any
 
 ```
 
+4. Load the in kernel NAT module: `kldload ipfw_nat`
+
+
 ## Authors
 
 * **me** - *Initial work* - [PrivacyWonk](https://github.com/PrivacyWonk)
