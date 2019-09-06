@@ -60,7 +60,7 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 
 #### Create Certificate Infrastructure
 
-Execute all of these commands from `/usr/local/etc/ipsec.d/`. Note, the Subject Alternative Name (SAN) must contain the IP address or DNS of the VPN server. I suggest keeping it simple and sticking the IP address. It is required for interoperability with android, IOS, Windows, Linux, etc. strongSwan has a wealth of documentation on PKI particulars for each situation and I highly suggest reading through it to fully understand what is being done below. 
+Below, I have detailed out the step by step commands to manually create a keypairs for the CA, Server, and clients. However, these actions have been scripted below. The commands are presented for education. 
 
 ##### 1. A Private Key
 
@@ -77,6 +77,8 @@ Update the Country (C), Organization (O), and Common Name (CN) to your own envir
 `ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem`
 
 ##### 4. Server Cert
+
+Note the CN and Subject Alternative Name (SAN) must contain the IP address or DNS of the VPN server. I suggest keeping it simple and sticking the IP address. It is required for interoperability with android, IOS, Windows, Linux, etc. strongSwan has a wealth of documentation on PKI particulars for each situation and I highly suggest reading through it to fully understand what is being done below. 
 
 `ipsec pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=US, O=TEST, CN=VPN_SERVER_IP" --san "VPN_SERVER_IP" > certs/ipsec-server-cert.pem`
 
@@ -131,6 +133,8 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 ```
 
 ##### 7. Script for client certs and keys
+
+This script will produce two versions of the client certificate. One for linux/android/iOS use and one for windows. The Windows version has "-windows" in the file name.
 
 ```
     #!/bin/bash
