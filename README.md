@@ -111,13 +111,19 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 
 
    ### do not change anything below this line
+        echo "Creating CA Private key"
    ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-ca-key.pem
+        echo "Creating CA Self-Signed Cert"
+   ipsec pki --self --flag serverAuth --in private/ipsec-ca-key.pem --type rsa --digest sha256 --dn "C=${country}, O=${organization}, CN=${organization} CA" --ca --lifetime 3650 --outform pem > cacerts/ipsec-ca-cert.pem
+        ipsec pki --print -i  cacerts/ipsec-ca-cert.pem
 
-   ipsec pki --self --flag serverAuth --in private/ipsec-ca-key.pem --type rsa --digest sha256 --dn "C=${country}, O="${organization}", CN=${organization} CA" --ca --lifetime 3650 --outform pem > cacerts/ipsec-ca-cert.pem
-
-   ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem   
-
+        echo ""
+        echo "Creating Server Print key"
+   ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem
+        echo "Creating signed server certificate"
    ipsec pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=${country}, O=${organization}, CN=${vpn_ip}" --san "${vpn_ip}" --san dns:"${vpn_ip}" > certs/ipsec-server-cert.pem
+        ipsec pki --print -i certs/ipsec-server-cert.pem
+
    
    #To prevent any whoopsies later, I suggest editing this file to comment out each directive line related to the CA after it's initial run.
 ```
