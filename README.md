@@ -185,7 +185,7 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 
 ### 3. Firewall 
 
-Quick IPFW firewall setup for SSH, DNS, IPSEC+NAT
+ IPFW firewall setup for SSH, DNS, IPSEC+NAT. 
 
 #### Pre-work
 
@@ -194,7 +194,7 @@ Quick IPFW firewall setup for SSH, DNS, IPSEC+NAT
 ```
 firewall_enable="YES"
 firewall_script="/usr/local/etc/ipfw.rules"
-firewall_logging="YES"
+firewall_logif="YES"
 gateway_enable="YES"
 natd_enable="YES"
 natd_interface="vtnet0"
@@ -269,7 +269,7 @@ $IPF 65534 deny log all from any to any
 
 ```
 
-4. Load the in kernel NAT module: `kldload ipfw_nat`
+4. Load the in kernel NAT module: `kldload ipfw_nat` if not loaded.
 
 
 ## Authors
