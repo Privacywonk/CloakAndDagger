@@ -149,8 +149,7 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
     ipsec pki --print -i certs/"${client}"-windows.cert.pem
 
    echo "Packing for Windows Export (creating .p12 bundle)...certs/"${client}"-windows.cert.p12"
-   openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem -name \""${clie
-nt}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}"-windows.cert.p12 -passout pass:
+   openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem -name \""${client}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}"-windows.cert.p12 -passout pass:
 
 ```
 
