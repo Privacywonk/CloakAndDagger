@@ -65,6 +65,7 @@ Below, I have detailed out the step by step commands to manually create a keypai
 ##### 1. A Private Key
 
 `ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-ca-key.pem`
+
 `chmod 400 private/ipsec-ca-key.pem`
 
 ##### 2. CA self-sign certificate
@@ -76,6 +77,7 @@ Update the Country (C), Organization (O), and Common Name (CN) to your own envir
 ##### 3. VPN Server Key 
 
 `ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem`
+
 `chmod 400 private/ipsec-server-key.pem`
 
 ##### 4. Server Cert
@@ -156,7 +158,7 @@ This script will produce two versions of the client certificate. One for linux/a
 
     echo "Creating "${client}" private key..."
     ipsec pki --gen --outform pem > private/"${client}".key.pem
-    chmod 600 private/"${client}".key.pem
+    chmod 400 private/"${client}".key.pem
     
     echo "Creating "${client}" certificate..."
     ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --dn C="${country}", O="${organization}", CN="${client}" --outform pem > certs/"${client}".cert.pem
