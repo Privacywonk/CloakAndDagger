@@ -101,6 +101,8 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
 
 ##### 6. Script for CA & Server Keys
 
+*Note:* Save output from this script in a scratchpad of some sort. You will need the information from the `ipsec pki --print` commands for editing the ipsec.conf file.
+
 ```
    #!/bin/bash
    # Change your values:
