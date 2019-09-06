@@ -159,6 +159,11 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
    echo "Packing for Windows Export (creating .p12 bundle)...certs/"${client}"-windows.cert.p12"
    openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem -name \""${client}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}"-windows.cert.p12 -passout pass:
 
+   echo ""
+   echo "Reminder! Add new client key to /usr/local/etc/ipsec.secrets. Copy line below"
+   echo ": RSA /usr/local/etc/ipsec.d/private/"${client}".key.pem"
+   echo ""
+
 ```
 
 
@@ -191,10 +196,10 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 
 4. Download the [charon-logging.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/charon-logging.conf) and place into `/usr/local/etc/strongswan.d/` directory. 
 	1. This will enable both file logging at `/var/log/charon.log` and in the syslog facility.
-	2. *Note* this has very detailed logging meant for debugging purposes. If you do not want to maintain those logs after you gotten the service up and running, comment everything out in this file.
+	2. **Note** this has very detailed logging meant for debugging purposes. If you do not want to maintain those logs after you gotten the service up and running, comment everything out in this file.
 5. `service strongswan start`
 6. Setup a test client (I suggest a linux client or android client using the strongSwan app). Follow the logs at `tail -f /var/log/charon.log` to see a connection working through. The logs will be pretty clear about connections not succeeding. They are *very* verbose.
-	1. *Note* you will be able to connect at this point but the VPN will *not* pass traffic yet. 
+	1. **Note** you will be able to connect at this point but the VPN will **not** pass traffic yet. 
 	
 7. A tip for Windows 10 clients: There are limits to the ciphers you can use by default but they can be expanded either by regedit or via power shell
 	1. For Windows 10 certificates: MMC -> Certificates -> Add Local Computer & Current User. Import .p12 bundle to Current User, move CA cert to Local Computer -> Trusted Certs
@@ -223,7 +228,7 @@ natd_enable="YES"
 natd_interface="vtnet0"
 natd_flags="-dynamic -m"
 ```
-*Note* - comment out or delete `#firewall_type="open"` as it will conflict with the `firewall_script` directive.
+**Note** - comment out or delete `#firewall_type="open"` as it will conflict with the `firewall_script` directive.
 
 3. Create `/usr/local/etc/ipfw.rules` and add the content below. Modify variables to your environment.
 
@@ -292,7 +297,7 @@ $IPF 65534 deny log all from any to any
 
 ```
 
-4. Start the firewall for the first time. *Warning* this will bounce you from your current SSH session. Suggest doing so from the console `/etc/rc.d/ipfw start`. 
+4. Start the firewall for the first time. **Warning** this will bounce you from your current SSH session. Suggest doing so from the console `/etc/rc.d/ipfw start`. 
 
 
 ### 4. Test it all
