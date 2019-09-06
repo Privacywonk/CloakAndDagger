@@ -206,49 +206,66 @@ natd_flags="-dynamic -m"
 
 ```
 IPF="ipfw -q add"
-WAN="[WANY interface here, e.g. eth0]"
+WAN="[WANY interface here, e.g. vtnet0]"
 WAN_IP="[YOUR IP HERE]"
 strongSwanNetwork="10.99.99.0/24"
 ipfw -q -f flush
 
 
-#loopback
+ipfw -q -f flush
+/sbin/ipfw -q table all flush
+
+#Establish NAT 1 config
+/sbin/ipfw -q nat 1 config if $WAN unreg_only reset
+
+#Loop back interfaces
 $IPF 10 allow all from any to any via lo0
 $IPF 20 deny all from any to 127.0.0.0/8
 $IPF 30 deny all from 127.0.0.0/8 to any
 $IPF 40 deny tcp from any to any frag
 
-#nat config
-ipfw -q nat 1 config if $WAN reset
-$IPF 50 nat 1 all from $strongSwanNetwork to any via $WAN out
-$IPF 55 nat 1 all from any to me via $WAN in
+# Catch spoofing from outside.
+$IPF 45 deny ip from any to any not antispoof via $WAN
 
-# statefull
-$IPF 100 check-state
-$IPF 110 allow tcp from any to any established
-$IPF 120 allow all from any to any out keep-state
-$IPF 130 allow icmp from any to any
+#NAT Inbound
+$IPF 100 nat 1 ip4 from any to any in via $WAN
+$IPF 105 check-state
 
-#DNS
-$IPF 1000 allow udp from any to any 53 in
-$IPF 1010 allow tcp from any to any 53 in
-$IPF 1020 allow udp from any to any 53 out
-$IPF 1030 allow tcp from any to any 53 out
+#allow ping
+$IPF 120 allow icmp from any to me
 
-#SSH
-$IPF 2000 allow tcp from any to $WAN_IP 22 in
-$IPF 2010 allow tcp from any to $WAN_IP 22 out
+#Allow DNS
+$IPF 130 allow tcp from me to any 53 out xmit $WAN setup keep-state
+$IPF 140 allow udp from me to any 53 out xmit $WAN keep-state
 
-#strongSwan
-$IPF 3000 allow esp from any to any
-$IPF 3010 allow ah from any to any
-$IPF 3020 allow ipencap from any to any
-$IPF 3030 allow udp from any to any 500
-$IPF 3030 allow udp from any to any 4500
-$IPF 3040 allow udp from any to any in recv $WAN frag
+#Allow strongSwan network
+$IPF 187 allow ip from any to $strongSwanNetwork
 
-# deny and log everything
+# NAT Outbound traffic allow
+$IPF 200 skipto 10000 tcp from $strongSwanNetwork to any out xmit $WAN
+$IPF 210 skipto 10000 udp from $strongSwanNetwork to any out xmit $WAN
+$IPF 215 allow tcp from me to any out via $WAN setup keep-state
+
+# Incoming Rules - SSH (22), other services as needed
+$IPF 500 allow tcp from any to me 22 in recv $WAN setup keep-state
+
+#Incoming Rules - StrongSwan
+$IPF 1010 allow udp from any to me 500 in recv $WAN keep-state
+$IPF 1011 allow udp from any to me 4500 in recv $WAN keep-state
+$IPF 1012 allow esp from any to any
+$IPF 1013 allow ah from any to any
+$IPF 1014 allow ipencap from any to any
+$IPF 1030 allow udp from any to me in recv $WAN frag
+
+# NAT rule for outgoing packets.
+$IPF 10000 nat 1 tag 10000 ip4 from any to any out via $WAN
+$IPF 10010 allow tcp from any to any out via vtnet0 tagged 10000 setup keep-state
+$IPF 10020 allow tcp from any to any out via vtnet0 tagged 10000 setup keep-state
+$IPF 10030 allow icmp from any to any out via vtnet0 tagged 10000
+
+# deny everything else
 $IPF 65534 deny log all from any to any
+
 
 ```
 
@@ -262,7 +279,7 @@ $IPF 65534 deny log all from any to any
 ## Contributors/Credits/References
 
 * **Rob Seastrom** - *DNS Ninja* - [Rob Seastrom](https://github.com/res3066) - guidance and a gut check on all things DNS.
-* **oogali** - *Network Ninja* - [oogali](https://github.com/oogali) - guidance and gut check on ipsec and firewall
+* **oogali** - *Network Ninja* - [oogali](https://github.com/oogali) - guidance, gut check, and troubleshooting on firewall and ipsec
 * [Pi-hole](https://docs.pi-hole.net/guides/unbound/) as All-Around DNS Solution -- initial inspiration to replicate
 * [Calomel](https://calomel.org/unbound_dns.html) Unbound Write up -- write up that got me thinking...
 * [strongSwan](https://wiki.strongswan.org/projects/strongswan/wiki) -- great documentation
