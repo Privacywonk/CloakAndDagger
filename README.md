@@ -65,6 +65,7 @@ Below, I have detailed out the step by step commands to manually create a keypai
 ##### 1. A Private Key
 
 `ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-ca-key.pem`
+`chmod 600 private/ipsec-ca-key.pem`
 
 ##### 2. CA self-sign certificate
 
@@ -75,6 +76,7 @@ Update the Country (C), Organization (O), and Common Name (CN) to your own envir
 ##### 3. VPN Server Key 
 
 `ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem`
+`chmod 600 private/ipsec-server-key.pem`
 
 ##### 4. Server Cert
 
@@ -90,6 +92,7 @@ For linux/android/iOS certificates:
 
 ```
 ipsec pki --gen --outform pem > private/client.key.pem
+chmod 600 private/client.key.pem
 ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=US, O=TEST, CN=client" --outform pem > certs/client.cert.pem
 ```
 
@@ -98,6 +101,7 @@ For Windows Certificates:
 
 ```
 ipsec pki --gen --outform pem > private/client.key.pem
+chmod 600 private/client.key.pem
 ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=US, O=TEST, CN=client" --flag clientAuth --san dns:client --outform pem > certs/client.cert.pem
 ```
 
@@ -117,6 +121,7 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
    ### do not change anything below this line
         echo "Creating CA Private key"
    ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-ca-key.pem
+   chmod 600 private/ipsec-ca-key.pem
         echo "Creating CA Self-Signed Cert"
    ipsec pki --self --flag serverAuth --in private/ipsec-ca-key.pem --type rsa --digest sha256 --dn "C=${country}, O=${organization}, CN=${organization} CA" --ca --lifetime 3650 --outform pem > cacerts/ipsec-ca-cert.pem
         ipsec pki --print -i  cacerts/ipsec-ca-cert.pem
@@ -124,6 +129,7 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
         echo ""
         echo "Creating Server Print key"
    ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem
+   chmod 600 private/ipsec-server-key.pem
         echo "Creating signed server certificate"
    ipsec pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=${country}, O=${organization}, CN=${vpn_ip}" --san "${vpn_ip}" --san dns:"${vpn_ip}" > certs/ipsec-server-cert.pem
         ipsec pki --print -i certs/ipsec-server-cert.pem
@@ -150,6 +156,7 @@ This script will produce two versions of the client certificate. One for linux/a
 
     echo "Creating "${client}" private key..."
     ipsec pki --gen --outform pem > private/"${client}".key.pem
+    chmod 600 private/"${client}".key.pem
     
     echo "Creating "${client}" certificate..."
     ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --dn C="${country}", O="${organization}", CN="${client}" --outform pem > certs/"${client}".cert.pem
