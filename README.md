@@ -26,9 +26,11 @@ The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts a
 4. Install void-zones-tools package for ad blocking `pkg install void-zones-tools`
 	1. Modify `/usr/local/bin/void-zones-update.sh` with [my version](https://github.com/Privacywonk/void-zones-tools/blob/master/void-zones-update.sh) that includes 6 additional blacklist sources
 	2. Add to crontab `30 07 * * * /usr/local/bin/void-zones-update.sh && service unbound reload > /dev/null 2>&1`
+	3. Execute `/usr/local/bin/void-zones-update.sh` to download initial files
 5. Configure new interface alias for dedicated DNS service on VPN network (change network to your own specifications)
-	1. Edit `/etc/rc.conf` and add  `ifconfig_vtnet0_alias1="inet 10.99.99.99 netmask 255.255.255.0"`
-	2. Take care with this new interface. Explore other services that may bind to 0.0.0.0 (e.g. SSH). Do not expose unnecessary services via this new network.
+	1. Create new virtual IP address for DNS server: `ifconfig vtnet0 10.99.99.99 netmask 255.255.255.0 alias`
+	2. Edit `/etc/rc.conf` and add  `ifconfig_vtnet0_alias1="inet 10.99.99.99 netmask 255.255.255.0"` to make this address permanent (surivive reboots)
+	3. Take care with this new interface. Explore other services that may bind to 0.0.0.0 (e.g. SSH). Do not expose unnecessary services via this new network.
 6. Edit `/etc/rc.conf` and add `unbound_enable="YES"`
 
 #### Configure Unbound
@@ -37,19 +39,21 @@ As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.9
 1. Download the [unbound.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/unbound.conf) file
 2. Edit variables (e.g. allowed networks, etc.)
 3. `service unbound start`
-4. `tail -f /usr/local/etc/unbound/unbound.log` to verify successful startup or correct configuration issues
-5. Test DNS & DNSSEC:
-	1. `dig @127.0.0.1 dnssec-failed.org. soa` should return `SERVFAIL` and no IP address
-	2. `dig @127.0.0.1 internetsociety.org. soa` should return `NOERROR` and an IP address
-
 
 #### Update resolv.conf
-1. Add 127.0.0.1 and 10.99.99.99 to /etc/resolv.conf
+1. Add `127.0.0.1` and `10.99.99.99` to `/etc/resolv.conf`
+2. Comment out whatever DNS servers DigitalOcean had pre-loaded
+
+#### Test DNS
+1. `tail -f /usr/local/etc/unbound/unbound.log` to verify successful startup or correct configuration issues
+2. Test DNS & DNSSEC:
+	1. `dig @127.0.0.1 dnssec-failed.org` should return `SERVFAIL` and no IP address
+	2. `dig @127.0.0.1 internetsociety.org` should return `NOERROR` and an IP address
 
 ### 2. strongswan VPN 
 
 #### Pre-work
-1. Verify kernel has NAT Tunneling (natt) and the crypto device (user-mode access to hardware-accelerated cryptography) enabled`/sbin/sysctl -a |egrep crypto|ipsec` look for `device crypto` and `kern.feature.ipsec` and `kern.feature.ipsec_natt = 1`
+1. Verify kernel has NAT Tunneling (natt) and the crypto device (user-mode access to hardware-accelerated cryptography) enabled `/sbin/sysctl -a |egrep "crypto|ipsec"` look for `device crypto` and `kern.feature.ipsec` and `kern.feature.ipsec_natt = 1`
 	1. if these are set to 0 or the device is missing, see [strongSwan documentation](https://wiki.strongswan.org/projects/strongswan/wiki/FreeBSD) for instructions to fix 
 2. Install strongSwan `pkg install strongswan`
 3. Add `strongswan_enable="YES"` to `/etc/rc.conf`
@@ -114,6 +118,8 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
    ipsec pki --gen --type rsa --size 4096 --outform pem > private/ipsec-server-key.pem   
 
    ipsec pki --pub --in private/ipsec-server-key.pem | pki --issue --outform pem --digest sha256 --lifetime 3650 --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --flag serverAuth --flag ikeIntermediate --dn "C=${country}, O=${organization}, CN=${vpn_ip}" --san "${vpn_ip}" --san dns:"${vpn_ip}" > certs/ipsec-server-cert.pem
+   
+   #To prevent any whoopsies later, I suggest editing this file to comment out each directive line related to the CA after it's initial run.
 ```
 
 ##### 7. Script for client certs and keys
@@ -134,11 +140,11 @@ ipsec pki --pub --in private/client.key.pem | ipsec pki --issue --cacert cacerts
     ipsec pki --gen --outform pem > private/"${client}".key.pem
     
     echo "Creating "${client}" certificate..."
-    ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn C="${country}", O="${organization}", CN="${client}" --outform pem > certs/"${client}".cert.pem
+    ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --dn C="${country}", O="${organization}", CN="${client}" --outform pem > certs/"${client}".cert.pem
     ipsec pki --print -i certs/"${client}".cert.pem
        
     echo "Creating "${client}" Windows certificate..."
-    ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey cacerts/ipsec-ca-key.pem --dn "C=${country}, O=${organization}, CN=${client}" --flag clientAuth --san dns:"${client}" --outform pem > certs/"${client}"-windows.cert.pem
+    ipsec pki --pub --in private/"${client}".key.pem | ipsec pki --issue --cacert cacerts/ipsec-ca-cert.pem --cakey private/ipsec-ca-key.pem --dn "C=${country}, O=${organization}, CN=${client}" --flag clientAuth --san dns:"${client}" --outform pem > certs/"${client}"-windows.cert.pem
 
     ipsec pki --print -i certs/"${client}"-windows.cert.pem
 
