@@ -185,9 +185,31 @@ This script will produce two versions of the client certificate. One for linux/a
 
 `openssl pkcs12 -export -inkey private/client.key.pem -in certs/client.cert.pem -name "client" -certfile cacerts/ipsec-ca-cert.pem -out certs/client.cert.p12`
 
-###### Package for Mobile (android). Install ipsec-ca-cert.pem separately
+###### Package for android
 
-`openssl pkcs12 -export -inkey private/client.key.pem -in certs/client.cert.pem -name "client" -caname "VPN_SERVER_IP"  -out certs/client.cert.p12`
+` #!/bin/bash
+  echo "Building Android .ssawn configuration file"
+  uuidswan=`/bin/uuidgen -1` #generate UUID
+  androidDisplayName='' #The display name you want to show on the AndroidApp Screen
+  openssl pkcs12 -export -inkey private/"${client}".key.pem -in certs/"${client}".cert.pem  -name \""${client}"\" -certfile cacerts/ipsec-ca-cert.pem -out certs/"${client}".cert.p12 -passout pass: #format key properly
+  cryptomaterial=`/usr/local/bin/base64  certs/"${client}".cert.p12` #convert to base64 (#note: You will likely need to install base64 - pkg install base64)
+
+#Print the JSON format 
+#Transfer file to cell phone. 
+#Note if you transfer via website and want this to auto-install on clients you need to set the application type in mime.conf (or elsewhere in web server config) to application/vnd.strongswan.profile per https://wiki.strongswan.org/projects/strongswan/wiki/AndroidVPNClientProfiles
+
+printf '
+{
+   "uuid": "%s",
+   "name": "%s",
+   "type": "ikev2-cert",
+   "remote": {
+     "addr": "%s"
+   },
+  "local": {
+     "p12": "%s"
+         }
+}\n' "$uuidswan" "$androidDisplayName" "$vpn_server" "$cryptomaterial" > certs/"${client}".sswan`
 
 ###### Windows Cert File needs
 
