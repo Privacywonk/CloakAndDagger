@@ -187,7 +187,8 @@ This script will produce two versions of the client certificate. One for linux/a
 
 ###### Package for android
 
-` #!/bin/bash
+```
+  #!/bin/bash
   echo "Building Android .ssawn configuration file"
   uuidswan=`/bin/uuidgen -1` #generate UUID
   androidDisplayName='' #The display name you want to show on the AndroidApp Screen
@@ -209,7 +210,8 @@ printf '
   "local": {
      "p12": "%s"
          }
-}\n' "$uuidswan" "$androidDisplayName" "$vpn_server" "$cryptomaterial" > certs/"${client}".sswan`
+}\n' "$uuidswan" "$androidDisplayName" "$vpn_server" "$cryptomaterial" > certs/"${client}".sswan
+```
 
 ###### Windows Cert File needs
 
