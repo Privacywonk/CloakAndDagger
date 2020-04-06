@@ -246,14 +246,12 @@ natd_flags="-dynamic -m"
 3. Create `/usr/local/etc/ipfw.rules` and add the content below. Modify variables to your environment.
 
 ```
-IPF="ipfw -q add"
+IPF="/sbin/ipfw -q add"
 WAN="[WANY interface here, e.g. vtnet0]"
 WAN_IP="[YOUR IP HERE]"
 strongSwanNetwork="10.99.99.0/24"
-ipfw -q -f flush
 
-
-ipfw -q -f flush
+/sbin/ipfw -q -f flush
 /sbin/ipfw -q table all flush
 
 #Establish NAT 1 config
