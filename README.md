@@ -275,11 +275,13 @@ WAN="[WANY interface here, e.g. vtnet0]"
 WAN_IP="[YOUR IP HERE]"
 strongSwanNetwork="10.99.99.0/24"
 
+#!/bin/sh
+
 /sbin/ipfw -q -f flush
 /sbin/ipfw -q table all flush
-
-#Establish NAT 1 config
+/sbin/ipfw -q disable one_pass
 /sbin/ipfw -q nat 1 config if $WAN unreg_only reset
+
 
 #Loop back interfaces
 $IPF 10 allow all from any to any via lo0
@@ -290,8 +292,12 @@ $IPF 40 deny tcp from any to any frag
 # Catch spoofing from outside.
 $IPF 45 deny ip from any to any not antispoof via $WAN
 
-#NAT Inbound
-$IPF 100 nat 1 ip4 from any to any in via $WAN
+#nat config
+$IPF 099 reass all from any to any in
+$IPF 100 nat 1 ip from any to any in via $WAN
+
+#check stateful rules. If marked as "keep-state" the packet has
+#already passed through filters and is "OK" without futher rule matching
 $IPF 105 check-state
 
 #allow ping
@@ -311,6 +317,8 @@ $IPF 215 allow tcp from me to any out via $WAN setup keep-state
 
 # Incoming Rules - SSH (22), other services as needed
 $IPF 500 allow tcp from any to me 22 in recv $WAN setup keep-state
+#$IPF 501 allow tcp from any to me 80 in recv $WAN setup keep-state
+#$IPF 502 allow tcp from any to me 443 in recv $WAN setup keep-state
 
 #Incoming Rules - StrongSwan
 $IPF 1010 allow udp from any to me 500 in recv $WAN keep-state
@@ -320,14 +328,16 @@ $IPF 1013 allow ah from any to any
 $IPF 1014 allow ipencap from any to any
 $IPF 1030 allow udp from any to me in recv $WAN frag
 
+# deny everything else, and log it
+# inbound catchall
+$IPF 5000 deny log all from any to any
+
 # NAT rule for outgoing packets.
 $IPF 10000 nat 1 tag 10000 ip4 from any to any out via $WAN
 $IPF 10010 allow tcp from any to any out via vtnet0 tagged 10000 setup keep-state
-$IPF 10020 allow tcp from any to any out via vtnet0 tagged 10000 setup keep-state
+$IPF 10020 allow udp from any to any out via vtnet0 tagged 10000 keep-state
 $IPF 10030 allow icmp from any to any out via vtnet0 tagged 10000
 
-# deny everything else
-$IPF 65534 deny log all from any to any
 
 
 ```
