@@ -270,9 +270,6 @@ firewall_nat_enable="YES"
 firewall_script="/usr/local/etc/ipfw.rules"
 firewall_logif="YES"
 gateway_enable="YES"
-natd_enable="YES"
-natd_interface="vtnet0"
-natd_flags="-dynamic -m"
 ```
 **Note** - comment out or delete `#firewall_type="open"` as it will conflict with the `firewall_script` directive.
 
