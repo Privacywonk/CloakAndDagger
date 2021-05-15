@@ -247,13 +247,22 @@ Download the [ipsec.conf](https://github.com/Privacywonk/CloakAndDagger/blob/mas
 
 ### 3. Firewall 
 
- IPFW firewall setup for SSH, DNS, IPSEC+NAT. 
+ IPFW firewall setup for SSH, DNS, IPSEC+NAT. Be sure to check out https://www.freebsd.org/doc/handbook/firewalls-ipfw.html for more information about IPFW, In Kernel NATing, and performance tuning options.
 
 #### Pre-work
 
 1. Check if ipfw_nat is loaded via kernel module: `kldstat |grep ipfw`. If not, `kldload ipfw_nat`
 
-2. Modify `/etc/rc.conf` to include:
+2. Tune sysctl variables to disable TCP Segementation Offloading and ensure forwarding is turned on
+
+```
+sudo sysctl net.inet.tcp.tso="0"
+sudo sysctl net.inet.ip.forwarding="1"
+
+Add these to /etc/sysctl.conf as well for permanence as well.
+```
+
+4. Modify `/etc/rc.conf` to include:
 
 ```
 firewall_enable="YES"
