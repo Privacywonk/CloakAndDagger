@@ -36,7 +36,7 @@ The service uses DNSSEC and 0x20-encoded random bits to foil spoofing attempts a
 #### Configure Unbound
 As configured, the service will run on 127.0.0.1 and 10.99.99.99. The 10.99.99.99 alias is for use on the to-be created VPN network.
 
-1. Download the [unbound.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/unbound.conf) file
+1. Download the [unbound.conf](https://github.com/Privacywonk/CloakAndDagger/blob/master/strongswan/unbound.conf) file
 2. Edit variables (e.g. allowed networks, etc.)
 3. `service unbound start`
 
